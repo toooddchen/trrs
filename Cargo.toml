@@ -1,0 +1,15 @@
+[package]
+name = "trrs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "*", features = ["full"] }
+axum = { version = "0.6.20" }
+axum-macros = "*"
+image = "*"
+imageproc = "*"
+num-traits = "*"
+rand = "*"
