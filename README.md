@@ -1,2 +1,1 @@
-# RuSt tiny RendeRer
-
+# Tiny Renderer written in Rust

@@ -1,7 +1,5 @@
 use std::{fmt::Display, ops};
 
-use num_traits::Num;
-
 use crate::util::NumLike;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -11,10 +9,37 @@ pub struct Vec_<T: NumLike, const N: usize> {
 
 pub type Vec2<T> = Vec_<T, 2>;
 pub type Vec3<T> = Vec_<T, 3>;
+pub type Vec4<T> = Vec_<T, 4>;
 pub type Vec2f = Vec2<f64>;
 pub type Vec3f = Vec3<f64>;
+pub type Vec4f = Vec4<f64>;
 pub type Vec2i = Vec2<i32>;
 pub type Vec3i = Vec3<i32>;
+
+/// Embed a vector into a larger vector
+pub fn embed<T: NumLike, const N1: usize, const N2: usize>(
+    v: &Vec_<T, N2>,
+    fill: T,
+) -> Vec_<T, N1> {
+    let mut rs = Vec_::<T, N1>::new();
+    for i in 0..N1 {
+        if i < N2 {
+            rs[i] = v[i];
+        } else {
+            rs[i] = fill;
+        }
+    }
+    rs
+}
+
+/// Project a vector into a smaller vector
+pub fn proj<T: NumLike, const N1: usize, const N2: usize>(v: &Vec_<T, N2>) -> Vec_<T, N1> {
+    let mut rs = Vec_::<T, N1>::new();
+    for i in 0..N1 {
+        rs[i] = v[i];
+    }
+    rs
+}
 
 impl<T: NumLike, const N: usize> Vec_<T, N> {
     pub fn new() -> Self {
@@ -25,6 +50,15 @@ impl<T: NumLike, const N: usize> Vec_<T, N> {
 
     pub fn from(arr: [T; N]) -> Self {
         Self { data: arr }
+    }
+
+    pub fn from_vec(vec: Vec<T>) -> Self {
+        assert!(vec.len() >= N);
+        let mut rs = Self::new();
+        for i in 0..N {
+            rs[i] = vec[i];
+        }
+        rs
     }
 
     pub fn dot(&self, other: &Self) -> T {
@@ -46,6 +80,14 @@ impl<T: NumLike, const N: usize> Vec_<T, N> {
             self[i] = self[i] / T::from(norm).unwrap();
         }
         return *self;
+    }
+
+    pub fn to_vec(&self) -> Vec<T> {
+        let mut rs = Vec::with_capacity(N);
+        for i in 0..N {
+            rs.push(self[i]);
+        }
+        rs
     }
 }
 
@@ -112,6 +154,18 @@ impl<T: NumLike, const N: usize> ops::Div for Vec_<T, N> {
         let mut rs: Vec_<T, N> = Vec_::new();
         for i in 0..N {
             rs[i] = self[i] / rhs[i];
+        }
+        rs
+    }
+}
+
+impl<T: NumLike, const N: usize> ops::Div<T> for Vec_<T, N> {
+    type Output = Vec_<T, N>;
+
+    fn div(self, rhs: T) -> Self::Output {
+        let mut rs: Vec_<T, N> = Vec_::new();
+        for i in 0..N {
+            rs[i] = self[i] / rhs;
         }
         rs
     }

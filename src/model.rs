@@ -4,17 +4,22 @@ use std::{
     path::Path,
 };
 
-use image::RgbaImage;
+use image::{Rgba, RgbaImage};
 
-use crate::geometry::{Vec3f, Vec3i};
+use crate::{
+    geometry::{Vec2f, Vec2i, Vec3f, Vec3i},
+    util::{splitext, RgbaImageExt},
+};
 
 #[derive(Debug)]
 pub struct Model {
     pub verts: Vec<Vec3f>,
     pub faces: Vec<Vec<Vec3i>>, // vertex/uv/normal indexes
     pub norms: Vec<Vec3f>,
-    pub uvs: Vec<Vec3f>,
+    pub uvs: Vec<Vec2f>,
     pub diffuse_map: RgbaImage,
+    pub normal_map: RgbaImage,
+    pub specular_map: RgbaImage,
 }
 
 impl Model {
@@ -23,7 +28,7 @@ impl Model {
             let mut verts: Vec<Vec3f> = Vec::new();
             let mut faces: Vec<Vec<Vec3i>> = Vec::new();
             let mut norms: Vec<Vec3f> = Vec::new();
-            let mut uvs: Vec<Vec3f> = Vec::new();
+            let mut uvs: Vec<Vec2f> = Vec::new();
             for line in lines {
                 let mut words = line.split_whitespace();
                 match words.next() {
@@ -42,8 +47,8 @@ impl Model {
                         norms.push(norm);
                     }
                     Some("vt") => {
-                        let mut uv: Vec3f = Vec3f::new();
-                        for i in 0..3 {
+                        let mut uv = Vec2f::new();
+                        for i in 0..2 {
                             uv[i] = words.next().unwrap().parse::<f64>().unwrap();
                         }
                         uvs.push(uv);
@@ -63,12 +68,18 @@ impl Model {
                     _ => {}
                 }
             }
-            let mut model = Self {
+
+            let diffusemap = Self::load_texture(filename, "_diffuse.tga");
+            let normalmap = Self::load_texture(filename, "_nm.tga");
+            let specularmap = Self::load_texture(filename, "_spec.tga");
+            let model = Self {
                 verts,
                 faces,
                 norms,
                 uvs,
-                diffuse_map: RgbaImage::new(1, 1),
+                diffuse_map: diffusemap,
+                normal_map: normalmap,
+                specular_map: specularmap,
             };
             return model;
         }
@@ -87,6 +98,10 @@ impl Model {
         &self.verts[i]
     }
 
+    pub fn vert_by(&self, iface: usize, nthvert: usize) -> &Vec3f {
+        &self.verts[self.face(iface)[nthvert] as usize]
+    }
+
     pub fn face(&self, idx: usize) -> Vec<i32> {
         let mut f = Vec::new();
         // &self.faces[i]
@@ -96,6 +111,11 @@ impl Model {
         f
     }
 
+    pub fn uv(&self, iface: usize, nthvert: usize) -> Vec2f {
+        let idx = self.faces[iface][nthvert][1] as usize;
+        self.uvs[idx]
+    }
+
     pub fn norm(&self, iface: usize, nthvert: usize) -> Vec3f {
         let idx = self.faces[iface][nthvert][2] as usize;
         let mut r = self.norms[idx];
@@ -103,8 +123,43 @@ impl Model {
         r
     }
 
-    pub fn load_texture(&mut self, filename: &str) {
-        self.diffuse_map = image::open(filename).unwrap().to_rgba8();
+    pub fn norm_by(&self, uvf: Vec2f) -> Vec3f {
+        let uv = (
+            (uvf[0] * self.normal_map.width() as f64) as u32,
+            (uvf[1] * self.normal_map.height() as f64) as u32,
+        );
+        let color = self.normal_map.get_pixel(uv.0, uv.1);
+        let mut r = Vec3f::new();
+        for i in 0..3 {
+            r[2 - i] = (color[i] as f64) / 255.0 * 2.0 - 1.0;
+        }
+        r
+    }
+
+    pub fn diffuse(&self, uv0: f64, uv1: f64) -> Rgba<u8> {
+        let uv = (
+            (uv0 * self.diffuse_map.width() as f64) as u32,
+            (uv1 * self.diffuse_map.height() as f64) as u32,
+        );
+        let color = self.diffuse_map.get_pixel(uv.0, uv.1);
+        *color
+    }
+
+    pub fn specular(&self, uv0: f64, uv1: f64) -> f64 {
+        let uv = (
+            (uv0 * self.specular_map.width() as f64) as u32,
+            (uv1 * self.specular_map.height() as f64) as u32,
+        );
+        let color = self.specular_map.get_pixel(uv.0, uv.1);
+        color[0] as f64 / 1.0
+    }
+
+    pub fn load_texture(filename: &str, suffix: &str) -> RgbaImage {
+        let (name, ext) = splitext(filename);
+        let p = name + suffix;
+        let mut img = image::open(p).unwrap().to_rgba8();
+        img.flip_vertical();
+        img
     }
 
     fn read_lines<P>(filename: P) -> io::Result<Vec<String>>

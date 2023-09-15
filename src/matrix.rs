@@ -3,7 +3,7 @@ use std::{
     ops::{Index, IndexMut, Mul},
 };
 
-use crate::util::NumLike;
+use crate::{geometry::Vec_, util::NumLike};
 
 /// A generic matrix struct with elements of type `T`, with `M` rows and `N` columns.
 #[derive(Debug)]
@@ -194,7 +194,31 @@ impl<T: NumLike> Mul<&Vec<T>> for &Mat<T> {
 
     fn mul(self, rhs: &Vec<T>) -> Self::Output {
         if self.N != rhs.len() {
-            panic!("Cannot multiply matrix and vector of incompatible dimensions");
+            panic!(
+                "Cannot multiply matrix and vector of incompatible dimensions.{:},{:}",
+                self.N,
+                rhs.len()
+            );
+        }
+        let mut ret = vec![T::zero(); self.M];
+        for i in 0..self.M {
+            for j in 0..self.N {
+                ret[i] = ret[i] + self.data[i][j] * rhs[j];
+            }
+        }
+        ret
+    }
+}
+
+impl<T: NumLike, const N: usize> Mul<&Vec_<T, N>> for &Mat<T> {
+    type Output = Vec<T>;
+
+    fn mul(self, rhs: &Vec_<T, N>) -> Self::Output {
+        if self.N != N {
+            panic!(
+                "Cannot multiply matrix and vector of incompatible dimensions.{:},{:}",
+                self.N, N
+            );
         }
         let mut ret = vec![T::zero(); self.M];
         for i in 0..self.M {
