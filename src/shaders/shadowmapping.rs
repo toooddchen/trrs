@@ -136,7 +136,6 @@ pub fn shadow_mapping_render() -> Vec<u8> {
     let center = Vec3f::from([0.0, 0.0, 0.0]);
     let up = Vec3f::from([0.0, 1.0, 0.0]);
 
-    let mut depth: RgbaImage = ImageBuffer::from_pixel(W, H, Rgba([0, 0, 0, 255]));
     let mut shadowbuffer: Vec<u8> = vec![0; (W * H) as usize];
 
     let mut gl = GL::new(light_dir, W, H);
@@ -152,9 +151,6 @@ pub fn shadow_mapping_render() -> Vec<u8> {
     let rcgl = Rc::new(&gl);
 
     let mut shader = DepthShader::new(Rc::clone(&rcgl), Rc::new(&model));
-
-    // shader.uniform_m = &gl.projection * &gl.model_view;
-    // shader.uniform_m_it = shader.uniform_m.invert_transpose();
 
     println!("ModelView:\n {:}", &gl.model_view);
     println!("Viewport:\n {:}", &gl.viewport);

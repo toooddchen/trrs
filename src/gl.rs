@@ -22,7 +22,7 @@ pub struct GL {
 
 pub trait IShader {
     fn vertex(&mut self, iface: usize, nthvert: usize) -> Vec4f;
-    fn fragment(&mut self, bc: Vec3f) -> Rgba<u8>;
+    fn fragment(&mut self, bc: Vec3f, gl_fragcoord: Vec3f) -> Rgba<u8>;
 }
 
 pub fn barycentric(pts: [Vec2f; 3], p: Vec2f) -> Vec3f {

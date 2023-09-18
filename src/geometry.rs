@@ -61,6 +61,12 @@ impl<T: NumLike, const N: usize> Vec_<T, N> {
         rs
     }
 
+    pub fn zero() -> Self {
+        Self {
+            data: [T::zero(); N],
+        }
+    }
+
     pub fn dot(&self, other: &Self) -> T {
         let mut sum = T::zero();
         for i in 0..N {

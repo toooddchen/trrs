@@ -54,11 +54,6 @@ pub fn move_camera() -> Vec<u8> {
             screen_coords.push(Vec3f::from([p[0] / p[3], p[1] / p[3], p[2] / p[3]]).to_vec3i());
             world_coords.push(v);
             intensities.push(model.norm(i, j).dot(&light_dir));
-            // if nout < 5 {
-            //     println!("SC:\n{:} {:}\n{:?}\n{:?}", i, j, p, v);
-            //     println!("INT:\n{:?}", intensities[j]);
-            //     nout += 1;
-            // }
         }
 
         triangle(
