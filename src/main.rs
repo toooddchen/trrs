@@ -1,3 +1,4 @@
+#![allow(dead_code, unused)]
 use axum::{
     http,
     response::{AppendHeaders, IntoResponse},
@@ -18,22 +19,23 @@ mod zbuf;
 #[tokio::main]
 async fn main() {
     let app = Router::new()
+        .route("/sample-line", get(sample_line))
         .route("/wire", get(wire))
-        .route("/line", get(sample_line))
-        .route("/triangle", get(sample_triangle))
+        .route("/sample-triangle", get(sample_triangle))
         .route("/flat-shading", get(flat_shading))
+        .route("/linear-light", get(linear_light))
         .route("/z-buf", get(z_buf))
         .route("/move-camera", get(move_camera))
-        .route("/linear-light", get(linear_light))
         .route("/shaders/gouraud", get(shader_gouraud))
         .route("/shaders/gouraud6l", get(shader_gouraud6l))
         .route("/shaders/texture", get(shader_texture))
         .route("/shaders/normalmapping", get(shader_normal_mapping))
         .route("/shaders/specularmapping", get(shader_specular_mapping))
-        .route("/shaders/shadowmapping", get(shader_shadow_mapping));
+        .route("/shaders/shadowmapping", get(shader_shadow_mapping))
+        .route("/shaders/ambientocclusion", get(shader_ambient_occlusion));
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
-        .serve(app.into_make_service()) // Your code here
+        .serve(app.into_make_service())
         .await
         .unwrap();
 }
@@ -136,6 +138,14 @@ async fn shader_specular_mapping() -> impl IntoResponse {
 
 async fn shader_shadow_mapping() -> impl IntoResponse {
     let bs = shaders::shadowmapping::shadow_mapping_render();
+    (
+        AppendHeaders([(http::header::CONTENT_TYPE, "image/png")]),
+        bs,
+    )
+}
+
+async fn shader_ambient_occlusion() -> impl IntoResponse {
+    let bs = shaders::ambientocclusion::ambient_occlusion_render();
     (
         AppendHeaders([(http::header::CONTENT_TYPE, "image/png")]),
         bs,

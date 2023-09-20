@@ -71,7 +71,7 @@ impl GL {
         pts: [Vec4f; 3],
         shader: &mut impl IShader,
         img: &mut RgbaImage,
-        zbuf: &mut Vec<u8>,
+        zbuf: &mut Vec<f64>,
     ) {
         let pts2: [Vec2f; 3] = [
             proj::<_, 2, 4>(&(pts[0] / pts[0][3])),
@@ -98,18 +98,18 @@ impl GL {
                     pts[0][2] * bc_screen[0] + pts[1][2] * bc_screen[1] + pts[2][2] * bc_screen[2];
                 let w =
                     pts[0][3] * bc_screen[0] + pts[1][3] * bc_screen[1] + pts[2][3] * bc_screen[2];
-                let frag_depth = (maxf(0.0, minf(255.0, z / w + 0.5))) as i32;
+                let frag_depth = maxf(0.0, minf(255.0, z / w + 0.5));
                 let idx = (x + y * img.width() as i32) as usize;
                 if bc_screen[0] < 0.0
                     || bc_screen[1] < 0.0
                     || bc_screen[2] < 0.0
-                    || zbuf[idx] > frag_depth as u8
+                    || zbuf[idx] > frag_depth
                 {
                     continue;
                 }
 
-                let color = shader.fragment(bc_screen);
-                zbuf[idx] = frag_depth as u8;
+                let color = shader.fragment(bc_screen, Vec3f::ZERO);
+                zbuf[idx] = frag_depth;
                 img.put_pixel(x as u32, y as u32, color);
             }
         }

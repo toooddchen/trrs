@@ -1,3 +1,4 @@
+pub mod ambientocclusion;
 pub mod gouraud;
 pub mod gouraud6l;
 pub mod normalmapping;

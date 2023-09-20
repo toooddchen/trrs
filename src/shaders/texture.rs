@@ -40,7 +40,7 @@ impl<'a> IShader for TextureShader<'a> {
         Vec4f::from_vec(r)
     }
 
-    fn fragment(&mut self, bc: Vec3f) -> Rgba<u8> {
+    fn fragment(&mut self, bc: Vec3f, gl_fragcoord: Vec3f) -> Rgba<u8> {
         let intensity = self.varying_intensity.dot(&bc);
         let uv = &self.varying_uv * &bc;
         let color = self.model.diffuse(uv[0], uv[1]);
@@ -65,7 +65,7 @@ pub fn texture_render() -> Vec<u8> {
     let eye = Vec3f::from([1.0, 1.0, 3.0]);
     let center = Vec3f::from([0.0, 0.0, 0.0]);
     let up = Vec3f::from([0.0, 1.0, 0.0]);
-    let mut zbuf: Vec<u8> = vec![0; (W * H) as usize];
+    let mut zbuf = vec![f64::MIN; (W * H) as usize];
 
     let mut gl = GL::new(light_dir, W, H);
     gl.lookat(eye, center, up);

@@ -211,6 +211,10 @@ impl<T: NumLike, const N: usize> Display for Vec_<T, N> {
 }
 
 impl Vec3f {
+    pub const ZERO: Vec3f = Vec3f {
+        data: [0.0, 0.0, 0.0],
+    };
+
     pub fn to_vec3i(&self) -> Vec3i {
         Vec3i::from([
             (self[0] + 0.5) as i32,

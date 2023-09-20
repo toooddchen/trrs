@@ -34,7 +34,6 @@ pub fn triangle(pts: Vec<Vec3f>, zbuf: &mut Vec<f64>, img: &mut RgbaImage, color
             bboxmax[j] = minf(clamp[j], maxf(bboxmax[j], pts[i][j]));
         }
     }
-    // println!("bboxmin: {:?}, bboxmax: {:?}", bboxmin, bboxmax);
     for x in bboxmin[0] as i32..=bboxmax[0] as i32 {
         for y in bboxmin[1] as i32..=bboxmax[1] as i32 {
             let bc_screen = barycentric(&pts, Vec3f::from([x as f64, y as f64, 0.0]));

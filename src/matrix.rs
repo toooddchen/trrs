@@ -24,7 +24,6 @@ impl<T: NumLike> Mat<T> {
             panic!("Cannot create matrix from empty data")
         }
         let mut mat = Self::new(data.len(), data[0].len());
-        // println!("mat: {:?} {:?}", mat.M, mat.N);
         for i in 0..mat.M {
             for j in 0..mat.N {
                 mat.data[i][j] = data[i][j];

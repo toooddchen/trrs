@@ -5,8 +5,8 @@ use crate::model::Model;
 use crate::util::RgbaImageExt;
 use image::{ImageBuffer, Rgba, RgbaImage};
 
-const W: u32 = 801;
-const H: u32 = 801;
+const W: u32 = 800;
+const H: u32 = 800;
 
 pub fn wireframe() -> Vec<u8> {
     let mut img: RgbaImage = ImageBuffer::new(W, H);

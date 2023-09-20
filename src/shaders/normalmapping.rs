@@ -40,7 +40,7 @@ impl<'a> IShader for NormalMappingShader<'a> {
         Vec4f::from_vec(r)
     }
 
-    fn fragment(&mut self, bc: Vec3f) -> Rgba<u8> {
+    fn fragment(&mut self, bc: Vec3f, gl_fragcoord: Vec3f) -> Rgba<u8> {
         let uv = &self.varying_uv * &bc;
         let _n = &self.uniform_m
             * &embed::<f64, 4, 3>(&self.model.norm_by(Vec2f::from([uv[0], uv[1]])), 1.0);
@@ -70,7 +70,7 @@ pub fn normal_mapping_render() -> Vec<u8> {
     let eye = Vec3f::from([1.0, 1.0, 3.0]);
     let center = Vec3f::from([0.0, 0.0, 0.0]);
     let up = Vec3f::from([0.0, 1.0, 0.0]);
-    let mut zbuf: Vec<u8> = vec![0; (W * H) as usize];
+    let mut zbuf = vec![f64::MIN; (W * H) as usize];
 
     let mut gl = GL::new(light_dir, W, H);
     gl.lookat(eye, center, up);

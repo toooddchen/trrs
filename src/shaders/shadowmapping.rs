@@ -50,7 +50,7 @@ impl<'a> IShader for DepthShader<'a> {
         r
     }
 
-    fn fragment(&mut self, bc: Vec3f) -> Rgba<u8> {
+    fn fragment(&mut self, bc: Vec3f, gl_fragcoord: Vec3f) -> Rgba<u8> {
         let p = &self.varying_tri * &bc;
         let intensity = p[2] / DEPTH;
         Rgba([
@@ -89,7 +89,7 @@ impl<'a> IShader for Pass2Shader<'a> {
         r
     }
 
-    fn fragment(&mut self, bc: Vec3f) -> Rgba<u8> {
+    fn fragment(&mut self, bc: Vec3f, gl_fragcoord: Vec3f) -> Rgba<u8> {
         let mut sb_p = Vec4f::from_vec(
             &self.uniform_m_shadow
                 * &embed::<f64, 4, 3>(&Vec3f::from_vec(&self.varying_tri * &bc), 1.0),
@@ -170,7 +170,7 @@ pub fn shadow_mapping_render() -> Vec<u8> {
 
     // 2-pass
     let mut img: RgbaImage = ImageBuffer::from_pixel(W, H, Rgba([0, 0, 0, 255]));
-    let mut zbuf: Vec<u8> = vec![0; (W * H) as usize];
+    let mut zbuf = vec![f64::MIN; (W * H) as usize];
 
     let mut p2shader = Pass2Shader::new(Rc::clone(&rcgl), Rc::new(&model), &mut shadowbuffer);
 
@@ -181,8 +181,6 @@ pub fn shadow_mapping_render() -> Vec<u8> {
         }
         gl.triangle(screen_coords, &mut p2shader, &mut img, &mut zbuf);
     }
-
-    println!("???");
 
     let mut bs: Vec<u8> = Vec::new();
     img.flip_vertical();

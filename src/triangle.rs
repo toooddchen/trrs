@@ -51,7 +51,6 @@ pub fn sample_triangle() -> Vec<u8> {
     const W: u32 = 200;
     const H: u32 = 200;
     let mut img: RgbaImage = ImageBuffer::new(W, H);
-    println!("triangle");
     triangle(
         vec![
             Vec2i::from([10, 10]),

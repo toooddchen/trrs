@@ -86,25 +86,15 @@ pub fn move_camera() -> Vec<u8> {
 
 pub fn lookat(eye: Vec3f, center: Vec3f, up: Vec3f) -> Mat<f64> {
     let z = (eye - center).normalize();
-    println!("lookat(): eye={:?} center={:?} z={:?}", eye, center, z);
     let x = (up ^ z).normalize();
-    println!("lookat(): up={:?} z={:?} x={:?}", up, z, x);
     let y = (z ^ x).normalize();
-    println!("lookat(): z={:?} x={:?} y={:?}", z, x, y);
-    // let mut minv: Mat<f64> = Mat::identity(4);
-    // let mut tr: Mat<f64> = Mat::identity(4);
     let mut res: Mat<f64> = Mat::identity(4);
     for i in 0..3 {
-        // minv[0][i] = x[i];
-        // minv[1][i] = y[i];
-        // minv[2][i] = z[i];
-        // tr[i][3] = -eye[i];
         res[0][i] = x[i];
         res[1][i] = y[i];
         res[2][i] = z[i];
         res[i][3] = -center[i];
     }
-    // &minv * &tr
     res
 }
 

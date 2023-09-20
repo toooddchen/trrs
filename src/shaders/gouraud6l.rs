@@ -37,7 +37,7 @@ impl<'a> IShader for Gouraud6LShader<'a> {
     }
 
     #[inline]
-    fn fragment(&mut self, bc: Vec3f) -> Rgba<u8> {
+    fn fragment(&mut self, bc: Vec3f, gl_fragcoord: Vec3f) -> Rgba<u8> {
         let intensity = match self.varying_intensity.dot(&bc) {
             i if i > 0.85 => 1.0,
             i if i > 0.60 => 0.80,
@@ -67,7 +67,7 @@ pub fn gouraud6l_render() -> Vec<u8> {
     let eye = Vec3f::from([1.0, 1.0, 3.0]);
     let center = Vec3f::from([0.0, 0.0, 0.0]);
     let up = Vec3f::from([0.0, 1.0, 0.0]);
-    let mut zbuf: Vec<u8> = vec![0; (W * H) as usize];
+    let mut zbuf = vec![f64::MIN; (W * H) as usize];
 
     let mut gl = GL::new(light_dir, W, H);
     gl.lookat(eye, center, up);
