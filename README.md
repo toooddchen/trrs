@@ -1,14 +1,18 @@
 # Tiny Renderer written in Rust
 
+Rust implementation of https://github.com/ssloy/tinyrenderer/wiki.
+
 https://github.com/ssloy/tinyrenderer/wiki 的 rust 实现.
 
-## 编译运行
+## Compile&Run 编译运行
 
 ```
 cargo run -r
 ```
 
-## 说明
+## Description 说明
+
+The program is implemented as an axum web service, with different routers corresponding to different lessons.
 
 程序被实现为一个`axum` web服务, 不同的router对应不同的课节. 
 
