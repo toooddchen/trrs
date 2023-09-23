@@ -7,8 +7,11 @@ https://github.com/ssloy/tinyrenderer/wiki 的 rust 实现.
 ## Compile&Run 编译运行
 
 ```
-cargo run -r
+git clone https://github.com/toooddchen/trrs.git &&
+cd trrs
+cargo run -r 
 ```
+open http://localhost:8080/wire
 
 ## Description 说明
 

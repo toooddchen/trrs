@@ -88,9 +88,9 @@ pub fn flat_shading() -> Vec<u8> {
             screen_coords,
             &mut img,
             Rgba([
-                rng.gen_range(0, 255),
-                rng.gen_range(0, 255),
-                rng.gen_range(0, 255),
+                rng.gen_range(0..255),
+                rng.gen_range(0..255),
+                rng.gen_range(0..255),
                 255,
             ]),
         );
